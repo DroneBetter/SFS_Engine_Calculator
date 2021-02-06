@@ -141,22 +141,6 @@ def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadW
         global stageCombinationEffectiveEfficiencies
         stageCombinationEffectiveEfficiencies.append(list(combinationEffectiveEfficiencies))
 
-def findPossibilityStatistics(possibility,constants,nonConstants,gravity,prune):
-    global combinationsOfStages
-    combinationsOfStages[possibility]
-    global engineCumulativeMasses
-    engineCumulativeMasses=[]
-    global stageCumulativeMassesWithEngines
-    stageCumulativeMassesWithEngines=[]
-    for s in (stages-1,0,-1):
-        engineCumulativeMasses.insert(0,stageCombinationMasses[s][combinationsOfStages[possibility][s]]+engineCumulativeMasses[0])
-    for s in stages:
-        stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
-        findStageCombinationStatistics(s,constants,stageCumulativeMassesWithEngines[s],1)
-    for s in stages:
-        findCombinationStatistics()
-    pruneCombinations()
-
 def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in craftStagesCombinations[n] that has this possibility's engines for this stage.
     global targets
     currentCombination=[0]*stages
@@ -175,6 +159,22 @@ def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs
             target-=1
         if target>-1:
             target=stages-1
+
+def findPossibilityStatistics(possibility,constants,nonConstants,gravity,prune):
+    global combinationsOfStages
+    global engineCumulativeMasses
+    engineCumulativeMasses=[]
+    global stageCumulativeMassesWithEngines
+    stageCumulativeMassesWithEngines=[]
+    for s in (stages-1,0,-1):
+        engineCumulativeMasses.insert(0,stageCombinationMasses[s][combinationsOfStages[possibility][s]]+engineCumulativeMasses[0])
+    for s in stages:
+        stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
+        findStageCombinationStatistics(s,constants,stageCumulativeMassesWithEngines[s],1)
+    for s in stages:
+        findCombinationStatistics()
+    pruneCombinations()
+    combinationsOfStages[possibility]
 
 def accelerate(x,y):
     global xVelocity
@@ -233,6 +233,25 @@ def findSuffix(number):
     else:
         return 'th'
 
+def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinationImpulses):
+    output=combinations
+    c=0
+    uhOh=0
+    for len(combinations):
+        for d in range(c+1,len(combinations)):
+            if uhOh=0:
+                if combinationMasses[d]<combinationMasses[c]:
+                    if combinationThrusts[d]>combinationMasses[c] and combinationImpulses[d]>combinationImpulses[c]:
+                        del output[c]
+                        c-=1
+                        uhOh=1
+                else:
+                    if combinationThrusts[c]>combinationMasses[d] and combinationImpulses[c]>combinationImpulses[d]:
+                        del output[d]
+        if uhOh==0:
+            c+=1
+        uhOh=0
+
 combinations=[]
 stageCombinations=[]
 tsiolkovsky=1
@@ -257,5 +276,6 @@ fuelMass=input("Of which fuel mass available for this stage?")
 craftMass=payloadMass+fuelMass
 gravity=input("Gravity?")
 craftDirection=0
-
+findCombinationsForAllStages()
 findAllCombinationStatistics(1,0,1)
+greatIterator()
