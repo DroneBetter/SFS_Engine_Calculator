@@ -59,7 +59,7 @@ def findCombinations(combinationEngines):
 def findCombinationsForAllStages():
     for stages:
         findCombinations(stageMasses[stage])
-        craftStagesCombinations.append(stageCombinations)
+        stageCombinations.append(stageCombinations)
 
 def clearCombinationStatisticLists(constants,nonConstants):
     if constants == 1:
@@ -153,7 +153,7 @@ def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadW
         clearCombinationStatisticLists(constants,nonConstants)
         findCombinationStatistics(stageCombinations[stage][c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
         if prune=1:
-            pruneCombinations(stageCombinations[stage],stageCombinationMasses[stage],stageCombinationThrusts[stage],stageCombinationImpulses[stage])
+            stageCombinations[stage]=pruneCombinations(stageCombinations[stage],stageCombinationMasses[stage],stageCombinationThrusts[stage],stageCombinationImpulses[stage])
     if constants==1:
         global stageCombinationMasses
         stageCombinationMasses.append(list(combinationMasses))
@@ -175,7 +175,12 @@ def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadW
         global stageCombinationEffectiveEfficiencies
         stageCombinationEffectiveEfficiencies.append(list(combinationEffectiveEfficiencies))
 
-def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in craftStagesCombinations[n] that has this possibility's engines for this stage.
+def findCombinationStatisticsForAllStages(constants,nonConstants,prune):
+    for s in len(stageCombinations):
+        findStageCombinationStatistics()
+
+
+def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in stageCombinations[n] that has this possibility's engines for this stage.
     global targets
     currentCombination=[0]*stages
     targets=[0]*stages
@@ -310,5 +315,5 @@ craftMass=payloadMass+fuelMass
 gravity=input("Gravity?")
 craftDirection=0
 findCombinationsForAllStages()
-findAllCombinationStatistics(1,0,1)
+findCombinationStatisticsForAllStages(1,0,1)
 greatIterator()
