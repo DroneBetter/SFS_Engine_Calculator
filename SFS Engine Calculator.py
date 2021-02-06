@@ -61,13 +61,46 @@ def findCombinationsForAllStages():
         findCombinations(stageMasses[stage])
         craftStagesCombinations.append(stageCombinations)
 
-def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fuelMass,gravity):
+def clearCombinationStatisticLists(constants,nonConstants):
+    if constants == 1:
+        global combinationMasses
+        combinationMasses=[]
+        global combinationThrusts
+        combinationThrusts=[]
+        global combinationConsumptions
+        combinationConsumptions=[]
+        global combinationImpulse
+        combinationImpulse=[]
+        global combinationImpulses
+        combinationImpulses=[]
+        global combinationCraftMass
+        combinationCraftMass=[]
+        global combinationCraftMasses
+        combinationCraftMasses=[]
+        global combinationListingTWR
+        combinationListingTWR=[]
+        global combinationListingTWRs
+        combinationListingTWRs=[]
+    if nonConstants == 1:
+        global combinationGravityForces
+        combinationGravityForces=[]
+        global combinationLifts
+        combinationLifts=[]
+        global combinationAngularTWRs
+        combinationAngularTWRs
+        combinationEffectiveEfficiency=[]
+        global combinationEffectiveEfficiencies
+        combinationEffectiveEfficiencies=[]
+
+
+def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fuelMass,gravity,accountForOwnMass):
     if constants == 1: #Constants mean regardless of external gravity, mass, thrust, specific impulse and fuel consumption. Constants can be calculated separately from non-constants, so criteria (ie. minimum TWR, maximum fuel consumption, maximum mass) can be checked before other things.
         global combinationMass
         global combinationThrust
         global combinationConsumption
         for target in range(len(combination)):
-            combinationMass+=engineMasses[combination[target]]
+            if accountForOwnMass == 1:
+                combinationMass+=engineMasses[combination[target]]
             combinationThrust+=engineThrusts[combination[target]]
             combinationConsumption+=engineConsumptions[combination[target]]
         global combinationMasses
@@ -117,9 +150,10 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
 
 def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines,prune):
     for c in range(len(stage)):
+        clearCombinationStatisticLists(constants,nonConstants)
         findCombinationStatistics(stageCombinations[stage][c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
         if prune=1:
-            pruneCombinations()
+            pruneCombinations(stageCombinations[stage],stageCombinationMasses[stage],stageCombinationThrusts[stage],stageCombinationImpulses[stage])
     if constants==1:
         global stageCombinationMasses
         stageCombinationMasses.append(list(combinationMasses))
@@ -160,7 +194,7 @@ def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs
         if target>-1:
             target=stages-1
 
-def findPossibilityStatistics(possibility,constants,nonConstants,gravity,prune):
+def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
     global combinationsOfStages
     global engineCumulativeMasses
     engineCumulativeMasses=[]
@@ -172,21 +206,7 @@ def findPossibilityStatistics(possibility,constants,nonConstants,gravity,prune):
         stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
         findStageCombinationStatistics(s,constants,stageCumulativeMassesWithEngines[s],1)
     for s in stages:
-        findCombinationStatistics()
-    pruneCombinations()
-    combinationsOfStages[possibility]
-
-def accelerate(x,y):
-    global xVelocity
-    global yVelocity
-    xVelocity+=x
-    yVelocity+=y
-
-def vAccelerate(direction,magnitude): #Hey. I'm applying for a new villain loan. Go by the name of Vector. It's a mathematical term, a quantity represented by an arrow, with both direction and magnitude. Vector! That's me, 'cause I'm committing crimes with both direction and magnitude. Oh, yeah! Check out my new weapon. Piranha gun! Oh, yes! Fires live piranhas. Ever seen one before? No, you haven't. I invented it.
-    global xVelocity
-    global yVelocity
-    xVelocity+=m.sin(direction)*magnitude
-    yVelocity+=m.cos(direction)*magnitude
+        findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,0,stageCumulativeMassesWithEngines[s],0,0,0)
 
 def calculatePerFrameDeltaV(possibility):
     findPossibilityStatistics(possibility,1,0,0,1)
@@ -220,6 +240,18 @@ def deprecatedFindDeltaV(deltaVtime):
         #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection])/Sqrt[-t^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftDirection])/Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] Cos[craftDirection] - Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftDirection])^2 + gravity^2 Sin[craftDirection]^2])/(fuelMass Sqrt[-combinationThrust ^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]])'))
         #Not as complicated as it looks, is from WolframAlpha's output of 'integral of sqrt((cos(a)-g+t/(m-fx))^2+(sin(a)g)^2)' where t=thrust, m=total mass, f=fuel mass, x=time, g=gravity.
 
+def accelerate(x,y):
+    global xVelocity
+    global yVelocity
+    xVelocity+=x
+    yVelocity+=y
+
+def vAccelerate(direction,magnitude): #Hey. I'm applying for a new villain loan. Go by the name of Vector. It's a mathematical term, a quantity represented by an arrow, with both direction and magnitude. Vector! That's me, 'cause I'm committing crimes with both direction and magnitude. Oh, yeah! Check out my new weapon. Piranha gun! Oh, yes! Fires live piranhas. Ever seen one before? No, you haven't. I invented it.
+    global xVelocity
+    global yVelocity
+    xVelocity+=m.sin(direction)*magnitude
+    yVelocity+=m.cos(direction)*magnitude
+
 def findSuffix(number):
     global suffix
     if number[len(number)-2]==1:
@@ -251,6 +283,7 @@ def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinat
         if uhOh==0:
             c+=1
         uhOh=0
+    return output
 
 combinations=[]
 stageCombinations=[]
