@@ -57,7 +57,7 @@ def findCombinations(combinationEngines):
     stageCombinations.append(combinations)
 
 def findCombinationsForAllStages():
-    for stages:
+    for range(len(stages)):
         findCombinations(stageMasses[stage])
         stageCombinations.append(stageCombinations)
 
@@ -148,10 +148,10 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
         global combinationDeltaV
         combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
 
-def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines,prune):
+def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines,prune): #stage argument wants a list of the stage's combinations, not its identifier in the list.
     for c in range(len(stage)):
         clearCombinationStatisticLists(constants,nonConstants)
-        findCombinationStatistics(stageCombinations[stage][c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
+        findCombinationStatistics(stage[c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
         if prune=1:
             stageCombinations[stage]=pruneCombinations(stageCombinations[stage],stageCombinationMasses[stage],stageCombinationThrusts[stage],stageCombinationImpulses[stage])
     if constants==1:
@@ -176,9 +176,8 @@ def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadW
         stageCombinationEffectiveEfficiencies.append(list(combinationEffectiveEfficiencies))
 
 def findCombinationStatisticsForAllStages(constants,nonConstants,prune):
-    for s in len(stageCombinations):
-        findStageCombinationStatistics()
-
+    for s in range(len(stageCombinations)):
+        findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,gravity,payloadWithEngines,prune)
 
 def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in stageCombinations[n] that has this possibility's engines for this stage.
     global targets
@@ -205,11 +204,11 @@ def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
     engineCumulativeMasses=[]
     global stageCumulativeMassesWithEngines
     stageCumulativeMassesWithEngines=[]
-    for s in (stages-1,0,-1):
+    for s in range(stages-1,-1,-1):
         engineCumulativeMasses.insert(0,stageCombinationMasses[s][combinationsOfStages[possibility][s]]+engineCumulativeMasses[0])
     for s in stages:
         stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
-        findStageCombinationStatistics(s,constants,stageCumulativeMassesWithEngines[s],1)
+        findStageCombinationStatistics(stageCombinations[s],constants,stageCumulativeMassesWithEngines[s],1)
     for s in stages:
         findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,0,stageCumulativeMassesWithEngines[s],0,0,0)
 
@@ -227,7 +226,7 @@ def calculatePerFrameDeltaV(possibility):
     angle=0
     for s in stages:
         findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]])
-        for frames in stageFuelMasses[s]/stageEngineConsumptions[s]:
+        for frames in range(stageFuelMasses[s]/stageEngineConsumptions[s]):
             directionAndDistance(1,1,xPosition,yPosition,0,0)
             vAccelerate(direction,(1/distance^2)*(9.8/(1/315000^2)))
             vAccelerate(angle,stageThrusts[s]/(stageCumulativeMassesWithEngines[stage])
@@ -274,7 +273,7 @@ def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinat
     output=combinations
     c=0
     uhOh=0
-    for len(combinations):
+    for range(len(combinations)):
         for d in range(c+1,len(combinations)):
             if uhOh=0:
                 if combinationMasses[d]<combinationMasses[c]:
