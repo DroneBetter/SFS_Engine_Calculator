@@ -45,7 +45,7 @@ def findCombinations(combinationEngines):
             #print("Changed last:",currentCombination)
             currentCombination[target]+=1
         #print("Dominoing:",(not(target==-1))and(currentCombination[target]==engines))
-        while (not(target==-1))and(currentCombination[target]==engines):
+        while not(target==-1) and currentCombination[target]==engines:
             currentCombination[target-1]+=1
             for target2 in range(target,combinationEngines):
                 currentCombination[target2]=currentCombination[target-1]
@@ -189,7 +189,7 @@ def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs
             combinationsOfStages.append(list(currentCombination)) #Don't replace combinationsOfStages with stageCombinations, not a mistake, they're themselves combinations of stage combinations.
             #print("Changed last:",currentCombination)
             currentCombination[target]+=1
-        while (not(target==-1))and(currentCombination[target]==len(stageCombinations[target])):
+        while not(target==-1) and currentCombination[target]==len(stageCombinations[target]):
             currentCombination[target-1]+=1
             for target2 in range(target,stages):
                 currentCombination[target2]=0
@@ -282,14 +282,13 @@ def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplica
                         if pruneDuplicates==1:
                             del output[d]
                             ohUh=1
-                if pruneMasses[d]<=pruneMasses[c]:
-                    if pruneThrusts[d]>=pruneThrusts[c] and pruneImpulses[d]>=pruneImpulses[c]:
-                        del output[c]
-                        uhOh=1
-                if pruneMasses[c]<=pruneMasses[d]:
-                    if pruneThrusts[c]>=pruneThrusts[d] and pruneImpulses[c]>=pruneImpulses[d]:
-                        del output[d]
-                        ohUh=1
+                else:
+                    if pruneMasses[d]<=pruneMasses[c] and pruneThrusts[d]>=pruneThrusts[c] and pruneImpulses[d]>=pruneImpulses[c]:
+                            del output[c]
+                            uhOh=1
+                    elif pruneMasses[c]<=pruneMasses[d] and pruneThrusts[c]>=pruneThrusts[d] and pruneImpulses[c]>=pruneImpulses[d]:
+                            del output[d]
+                            ohUh=1
             if ohUh==0:
                 d+=1
         if uhOh==0:
