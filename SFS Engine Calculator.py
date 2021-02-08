@@ -272,11 +272,11 @@ def findSuffix(number):
 def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinationImpulses,pruneDuplicates):
     output=combinations
     c=0
-    uhOh=0
     for range(len(combinations)):
-        ohUh=0
+        uhOh=0
         d=0
         for range(c+1,len(combinations)):
+            ohUh=0
             if uhOh=0:
                 if combinationMasses[d]=combinationMasses[c] and combinationThrusts[d]=combinationMasses[c] and combinationImpulses[d]=combinationImpulses:
                         if pruneDuplicates==1:
@@ -292,10 +292,8 @@ def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinat
                         ohUh=1
             if ohUh==0:
                 d+=1
-            ohUh=0
         if uhOh==0:
             c+=1
-        uhOh=0
     return output
 
 combinations=[]
