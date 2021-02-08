@@ -277,24 +277,17 @@ def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinat
         ohUh=0
         d=0
         for range(c+1,len(combinations)):
-            if uhOh=0 and ohUh=0:
-                if combinationMasses[d]<combinationMasses[c]:
-                    if combinationThrusts[d]>=combinationMasses[c] and combinationImpulses[d]>=combinationImpulses[c]:
-                        del output[c]
-                        uhOh=1
-                elif combinationMasses[c]<combinationMasses[d]:
-                    if combinationThrusts[c]>=combinationMasses[d] and combinationImpulses[c]>=combinationImpulses[d]:
-                        del output[d]
-                        ohUh=1
-                elif combinationMasses[d]=combinationMasses[c]:
-                    if combinationThrusts[d]=combinationMasses[c] and combinationImpulses[d]=combinationImpulses:
+            if uhOh=0:
+                if combinationMasses[d]=combinationMasses[c] and combinationThrusts[d]=combinationMasses[c] and combinationImpulses[d]=combinationImpulses:
                         if pruneDuplicates==1:
                             del output[d]
                             ohUh=1
+                if combinationMasses[d]<=combinationMasses[c]:
                     if combinationThrusts[d]>=combinationMasses[c] and combinationImpulses[d]>=combinationImpulses[c]:
                         del output[c]
                         uhOh=1
-                    elif combinationThrusts[c]>=combinationMasses[d] and combinationImpulses[c]>=combinationImpulses[d]:
+                if combinationMasses[c]<=combinationMasses[d]:
+                    if combinationThrusts[c]>=combinationMasses[d] and combinationImpulses[c]>=combinationImpulses[d]:
                         del output[d]
                         ohUh=1
             if ohUh==0:
