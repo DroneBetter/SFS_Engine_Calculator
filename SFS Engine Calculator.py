@@ -269,25 +269,25 @@ def findSuffix(number):
     else:
         return 'th'
 
-def pruneCombinations(combinations,combinationMasses,combinationThrusts,combinationImpulses,pruneDuplicates):
-    output=combinations
+def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplicates):
+    output=prunes
     c=0
-    for range(len(combinations)):
+    for range(len(prunes)):
         uhOh=0
         d=0
-        for range(c+1,len(combinations)):
+        for range(c+1,len(prunes)):
             ohUh=0
             if uhOh=0:
-                if combinationMasses[d]=combinationMasses[c] and combinationThrusts[d]=combinationMasses[c] and combinationImpulses[d]=combinationImpulses:
+                if pruneMasses[d]=pruneMasses[c] and pruneThrusts[d]=pruneThrusts[c] and pruneImpulses[d]=pruneImpulses:
                         if pruneDuplicates==1:
                             del output[d]
                             ohUh=1
-                if combinationMasses[d]<=combinationMasses[c]:
-                    if combinationThrusts[d]>=combinationMasses[c] and combinationImpulses[d]>=combinationImpulses[c]:
+                if pruneMasses[d]<=pruneMasses[c]:
+                    if pruneThrusts[d]>=pruneThrusts[c] and pruneImpulses[d]>=pruneImpulses[c]:
                         del output[c]
                         uhOh=1
-                if combinationMasses[c]<=combinationMasses[d]:
-                    if combinationThrusts[c]>=combinationMasses[d] and combinationImpulses[c]>=combinationImpulses[d]:
+                if pruneMasses[c]<=pruneMasses[d]:
+                    if pruneThrusts[c]>=pruneThrusts[d] and pruneImpulses[c]>=pruneImpulses[d]:
                         del output[d]
                         ohUh=1
             if ohUh==0:
