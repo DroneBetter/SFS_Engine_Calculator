@@ -10,10 +10,10 @@ engineNames=["Titan","Frontier","Hawk","Valiant","Kolibri","Ion"]
 engines=len(engineNames)
 engineMasses=[12,6,3.5,2,0.5,0.5]
 engineThrusts=[400,100,120,40,15,2]
-engineEfficiencies=[240,290,240,280,260,1200]
+engineImpulses=[240,290,240,280,260,1200]
 engineConsumptions=[]
-for i in range(len(engineEfficiencies)):
-    engineConsumptions.append(engineThrusts[i]/engineEfficiencies[i])
+for i in range(len(engineImpulses)):
+    engineConsumptions.append(engineThrusts[i]/engineImpulses[i])
 
 #print("Engine fuel consumptions:",engineConsumptions)
 
@@ -56,148 +56,65 @@ def findCombinations(combinationEngines):
     stageCombinations.append(combinations)
 
 def findCombinationsForAllStages():
-    for range(len(stages)):
-        findCombinations(stageMasses[stage])
+    for s in range(0,len(stages)):
+        findCombinations(stageMasses[s])
         stageCombinations.append(stageCombinations)
 
-def clearCombinationStatisticLists(constants,nonConstants):
-    if constants == 1:
-        global combinationMasses
-        combinationMasses=[]
-        global combinationThrusts
-        combinationThrusts=[]
-        global combinationConsumptions
-        combinationConsumptions=[]
-        global combinationImpulse
-        combinationImpulse=[]
-        global combinationImpulses
-        combinationImpulses=[]
-        global combinationCraftMass
-        combinationCraftMass=[]
-        global combinationCraftMasses
-        combinationCraftMasses=[]
-        global combinationStandardTWRs
-        combinationStandardTWRs=[]
-    if nonConstants == 1:
-        global combinationGravityForces
-        combinationGravityForces=[]
-        global combinationLifts
-        combinationLifts=[]
-        global combinationAngularTWRs
-        combinationAngularTWRs=[]
-        global combinationEffectiveEfficiencies
-        combinationEffectiveEfficiencies=[]
+def clearCombinationStatistics():
+    combinationStatistics=[]
 
-def clearStageStatisticLists(constants,nonConstants):
-    if constants == 1:
-        global stageCombinationMasses
-        stageCombinationMasses=[]
-        global stageThrusts
-        stageThrusts=[]
-        global stageCombinationConsumptions
-        stageCombinationConsumptions=[]
-        global stageCombinationImpulses
-        stageCombinationImpulses=[]
-        global stageCombinationMasses
-        stageCombinationMasses=[]
-        global stageCombinationCraftMasses
-        stageCombinationCraftMasses=[]
-        global stageCombinationStandardTWRs
-        stageCombinationStandardTWRs=[]
-    if nonConstants == 1:
-        global stageCombinationGravityForces
-        stageCombinationGravityForces=[]
-        global stageCombinationLifts
-        stageCombinationLifts=[]
-        global stageCombinationAngularTWRs
-        stageCombinationAngularTWRs=[]
-        global stageCombinationEffectiveEfficiencies
-        stageCombinationEffectiveEfficiencies=[]
+def clearStageStatistics():
+    stageCombinationStatistics=[]
 
 def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fuelMass,gravity,accountForOwnMass):
-    if constants == 1: #Constants mean regardless of external gravity, mass, thrust, specific impulse and fuel consumption. Constants can be calculated separately from non-constants, so criteria (ie. minimum TWR, maximum fuel consumption, maximum mass) can be checked before other things.
-        global combinationMass
-        global combinationThrust
-        global combinationConsumption
+    combinationStatistics=[] #Mass, thrust, consumption, impulse, craft mass, standard TWR, 
+    if constants == 1: #Constants are regardless of external gravity; mass, thrust, specific impulse, fuel consumption, total mass, TWR under standard gravity. Constants can be calculated without non-constants, so criteria (ie. minimum TWR, maximum fuel consumption, maximum mass) can be checked before other things are calculated.
+        combinationMass=0
+        combinationThrust=0
+        combinationConsumption=0
         for target in range(len(combination)):
             if accountForOwnMass == 1:
                 combinationMass+=engineMasses[combination[target]]
             combinationThrust+=engineThrusts[combination[target]]
             combinationConsumption+=engineConsumptions[combination[target]]
-        global combinationMasses
-        combinationMasses.append(combinationMass)
-        global combinationThrusts
-        combinationThrusts.append(combinationThrust)
-        global combinationConsumptions
-        combinationConsumptions.append(combinationConsumption)
-        global combinationImpulse
-        combinationImpulse=combinationThrust/combinationConsumption
-        global combinationImpulses
-        combinationImpulses.append(combinationImpulse)
-        global combinationCraftMass
-        combinationCraftMass=craftMass+combinationMass
-        global combinationCraftMasses
-        combinationCraftMasses.append(combinationCraftMass)
-        global combinationStandardTWR
-        combinationStandardTWR=combinationThrust/combinationCraftMass
-        global combinationStandardTWRs
-        combinationStandardTWRs.append(combinationStandardTWR)
-    if nonConstants == 1:
-        global combinationGravityForce
+        combinationStatistics.append(combinationMass)
+        combinationStatistics.append(combinationThrust)
+        combinationStatistics.append(combinationConsumption)
+        combinationStatistics.append(combinationThrust/combinationConsumption)
+        combinationStatistics.append(craftMass+combinationMass)
+        combinationStatistics.append(combinationThrust/combinationCraftMass)
+    if nonConstants == 1: #Non-constants regard external gravity and angle, etc.; Gravity force, lift (at angle), angular TWR,.
         combinationGravityForce=gravity*combinationCraftMass
-        global combinationGravityForces
-        combinationGravityForces.append(combinationGravityForce)
-        global combinationLift
-        combinationLift=cos(craftDirection)*combinationThrust
-        global combinationLifts
-        combinationLifts.append(combinationLift)
-        global combinationAngularTWR
+        combinationStatistics.append(combinationGravityForce)
+        combinationLift=m.cos(craftDirection)*combinationThrust
+        combinationStatistics.append(combinationLift)
         combinationAngularTWR=combinationLift/combinationGravityForce
-        global combinationAngularTWRs
-        combinationAngularTWRs.append(combinationAngularTWR)
-        global combinationEffectiveEfficiency
+        combinationStatistics.append(combinationAngularTWR)
         combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftDirection)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
-        global combinationEffectiveEfficiencies
-        combinationEffectiveEfficiencies.append(combinationEffectiveEfficiency)
-    if tsiolkovsky==1:
-        deprecatedFindDeltaV()
-    else:
-        deprecatedFindDeltaV(0)
-        global deltaVoffset
-        deltaVoffset=deltaV
-        deprecatedFindDeltaV(1)
-        global combinationDeltaV
-        combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
+        combinationStatistics.append(combinationEffectiveEfficiency)
+        if tsiolkovsky==1:
+            combinationDeltaV=deprecatedFindDeltaV(1)
+        else:
+            deprecatedFindDeltaV(0,0)
+            global deltaVoffset
+            deltaVoffset=deltaV
+            deprecatedFindDeltaV(0,1)
+            global combinationDeltaV
+            combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
+        combinationStatistics.append(combinationDeltaV)
+
 
 def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines): #stage argument wants a list of the stage's combinations, not its identifier in the list.
     global stageCombinations
+    global stageCombinationStatistics
     for c in range(len(stage)):
-        clearCombinationStatisticLists(constants,nonConstants)
+        clearCombinationStatistics()
         findCombinationStatistics(stage[c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
-    if constants==1:
-        global stageCombinationMasses
-        stageCombinationMasses.append(list(combinationMasses))
-        global stageCombinationThrusts
-        stageCombinationThrusts.append(list(combinationThrusts))
-        global stageCombinationConsumptions
-        stageCombinationConsumptions.append(list(combinationConsumptions))
-        global stageCombinationImpulses
-        stageCombinationImpulses.append(list(combinationImpulses))
-        global stageCombinationStandardTWRs
-        stageCombinationStandardTWRs.append(list(combinationStandardTWRs))
-    if nonConstants==1:
-        global stageCombinationGravityForces
-        stageCombinationGravityForces.append(list(combinationGravityForces))
-        global stageCombinationLifts
-        stageCombinationGravityForces.append(list(combinationLifts))
-        global stageCombinationAngularTWRs
-        stageCombinationGravityForces.append(list(combinationAngularTWRs))
-        global stageCombinationEffectiveEfficiencies
-        stageCombinationEffectiveEfficiencies.append(list(combinationEffectiveEfficiencies))
+        stageCombinationStatistics.append(combinationStatistics)
 
 def findCombinationStatisticsForAllStages(constants,nonConstants,prune):
     for s in range(len(stageCombinations)):
-        findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,gravity,payloadWithEngines,prune)
+        findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,gravity,payloadWithEngines)
 
 def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in stageCombinations[n] that has this possibility's engines for this stage.
     global targets
@@ -225,7 +142,7 @@ def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
     global stageCumulativeMassesWithEngines
     stageCumulativeMassesWithEngines=[]
     for s in range(stages-1,-1,-1):
-        engineCumulativeMasses.insert(0,stageCombinationMasses[s][combinationsOfStages[possibility][s]]+engineCumulativeMasses[0])
+        engineCumulativeMasses.insert(0,stageCombinationStatistics[s][combinationsOfStages[possibility][s]][0]+engineCumulativeMasses[0])
     for s in stages:
         stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
         findStageCombinationStatistics(stageCombinations[s],constants,stageCumulativeMassesWithEngines[s],1)
@@ -246,7 +163,7 @@ def calculatePerFrameDeltaV(possibility):
     angle=0
     for s in stages:
         findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]])
-        for frames in range(stageFuelMasses[s]/stageCombinationConsumptions[s]):
+        for frames in range(stageFuelMasses[s]/stageCombinationStatistics[s][2]):
             directionAndDistance(1,1,xPosition,yPosition,0,0)
             vAccelerate(direction,(1/distance^2)*(9.8/(1/315000^2)))
             vAccelerate(angle,stageThrusts[s]/(stageCumulativeMassesWithEngines[stage])
@@ -255,14 +172,19 @@ def calculatePerFrameDeltaV(possibility):
             directionAndDistance(1,1,0,0,xVelocity,yVelocity)
             vAccelerate(direction,distance*(1-(stageAerodynamicDrags*atmosphericdensity/stageCumulativeMassesWithEngines[s])))
 
-def deprecatedFindDeltaV(deltaVtime):
+def deprecatedFindDeltaV(tsiolkovsky,deltaVtime):
     if tsiolkovsky==1:
-        deltaV=CombinationImpulse*gravity*log(craftMass/payloadMass)
+        global craftMass
+        global payloadMass
+        global gravity
+        global combinationConsumption
+        deltaV=CombinationImpulse*m.ln(craftMass/payloadMass)-gravity*(fuelMass/combinationConsumption)
     else:
         true #Stops indentation errors by filling the else statement.
         #deltaV=-1*(fuelMass*gravity*time+math.log(combinationCraftMass-fuelMass*time))/fuelMass
         #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection])/Sqrt[-t^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftDirection])/Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] Cos[craftDirection] - Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftDirection])^2 + gravity^2 Sin[craftDirection]^2])/(fuelMass Sqrt[-combinationThrust ^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]])'))
         #Not as complicated as it looks, is from WolframAlpha's output of 'integral of sqrt((cos(a)-g+t/(m-fx))^2+(sin(a)g)^2)' where t=thrust, m=total mass, f=fuel mass, x=time, g=gravity.
+        return deltaV
 
 def accelerate(x,y):
     global xVelocity
@@ -323,8 +245,8 @@ def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplica
 
 def pruneAllStages(pruneDuplicates):
     for s in range(len(stageCombinations)):
-        stageCombinations[s]=pruneCombinations(stageCombinations[s],stageCombinationMasses[s],stageCombinationThrusts[s],stageCombinationImpulses[s],pruneDuplicates)
-    clearCombinationStatisticLists(1,1)
+        stageCombinations[s]=pruneCombinations(stageCombinations[s],stageCombinationStatistics[s][0],stageCombinationStatistics[s][1],stageCombinationStatistics[s][3],pruneDuplicates)
+    clearCombinationStatistics()
     findCombinationStatisticsForAllStages(1,0,1)
 
 combinations=[]
