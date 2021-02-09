@@ -92,6 +92,7 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
         combinationStatistics.append(combinationAngularTWR)
         combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftDirection)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
         combinationStatistics.append(combinationEffectiveEfficiency)
+        global combinationDeltaV
         if tsiolkovsky==1:
             combinationDeltaV=deprecatedFindDeltaV(1)
         else:
@@ -99,7 +100,6 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
             global deltaVoffset
             deltaVoffset=deltaV
             deprecatedFindDeltaV(0,1)
-            global combinationDeltaV
             combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
         combinationStatistics.append(combinationDeltaV)
 
@@ -166,7 +166,7 @@ def calculatePerFrameDeltaV(possibility):
         for frames in range(stageFuelMasses[s]/stageCombinationStatistics[s][2]):
             directionAndDistance(1,1,xPosition,yPosition,0,0)
             vAccelerate(direction,(1/distance^2)*(9.8/(1/315000^2)))
-            vAccelerate(angle,stageThrusts[s]/(stageCumulativeMassesWithEngines[stage])
+            vAccelerate(angle,stageThrusts[s]/(stageCumulativeMassesWithEngines[stage]))
             xPosition+=xVelocity
             yPosition+=yVelocity
             directionAndDistance(1,1,0,0,xVelocity,yVelocity)
@@ -198,32 +198,19 @@ def vAccelerate(direction,magnitude): #Hey. I'm applying for a new villain loan.
     xVelocity+=m.sin(direction)*magnitude
     yVelocity+=m.cos(direction)*magnitude
 
-def findSuffix(number):
-    global suffix
-    if number[len(number)-2]==1:
-        return 'th'
-    elif number[len(number)-1]==1:
-        return 'st'
-    elif number[len(number)-1]==2:
-        return 'nd'
-    elif number[len(number)-1]==3:
-        return 'rd'
-    else:
-        return 'th'
-
 def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplicates):
     output=prunes
     '''outputIDs=[]
     for ID in range(len(prunes)):
         outputIDs.append(ID)''' #Not necessary.
     c=0
-    for range(len(prunes)):
+    for _ in range(len(prunes)):
         uhOh=0
         d=0
-        for range(c+1,len(prunes)):
+        for _ in range(c+1,len(prunes)):
             ohUh=0
-            if uhOh=0:
-                if pruneMasses[d]=pruneMasses[c] and pruneThrusts[d]=pruneThrusts[c] and pruneImpulses[d]=pruneImpulses:
+            if uhOh==0:
+                if pruneMasses[d]==pruneMasses[c] and pruneThrusts[d]==pruneThrusts[c] and pruneImpulses[d]==pruneImpulses:
                         if pruneDuplicates==1:
                             del output[d]
                             #del outputIDs[d]
@@ -249,6 +236,23 @@ def pruneAllStages(pruneDuplicates):
     clearCombinationStatistics()
     findCombinationStatisticsForAllStages(1,0,1)
 
+def findSuffix(number,append):
+    strumber=str(number)
+    global suffix
+    if strumber[len(strumber)-2]==1:
+        output='th'
+    elif strumber[len(strumber)-1]==1:
+        output='st'
+    elif strumber[len(strumber)-1]==2:
+        output='nd'
+    elif strumber[len(strumber)-1]==3:
+        output='rd'
+    else:
+        output='th'
+    if append==1:
+        output=strumber+output
+    return output
+
 combinations=[]
 stageCombinations=[]
 tsiolkovsky=1
@@ -258,7 +262,7 @@ stageFuelMasses=[]
 stageSeparationForces=[]
 stageAerodynamicDrags=[]
 for s in range(stages):
-    stageMasses.append(input("What is your "+str(s)+findSuffix(s)+" stage's mass (excluding above stages)?"))
+    stageMasses.append(input("What is your "+findSuffix(s,1)+" stage's mass (excluding above stages)?"))
     stageFuelMasses.append(input("Of which how much is fuel?"))
     if s<stages-1:
         stageSeparationForces.append(input("How much separation force does this stage have from its successor?"))
