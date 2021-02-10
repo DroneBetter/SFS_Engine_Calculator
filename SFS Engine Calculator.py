@@ -83,15 +83,15 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
         combinationStatistics.append(combinationThrust/combinationConsumption)
         combinationStatistics.append(craftMass+combinationMass)
         combinationStatistics.append(combinationThrust/combinationCraftMass)
-    if nonConstants == 1: #Non-constants regard external gravity and angle, etc.; Gravity force, lift (at angle), angular TWR,.
+    if nonConstants == 1: #Non-constants regard external gravity and angle, etc.; Gravity force, lift (at angle), angular TWR, .
         combinationGravityForce=gravity*combinationCraftMass
         combinationStatistics.append(combinationGravityForce)
-        combinationLift=m.cos(craftDirection)*combinationThrust
+        combinationLift=m.cos(craftAngle)*combinationThrust
         combinationStatistics.append(combinationLift)
         combinationAngularTWR=combinationLift/combinationGravityForce
         combinationStatistics.append(combinationAngularTWR)
-        combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftDirection)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
-        combinationStatistics.append(combinationEffectiveEfficiency)
+        #combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftAngle)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
+        #combinationStatistics.append(combinationEffectiveEfficiency)
         global combinationDeltaV
         if tsiolkovsky==1:
             combinationDeltaV=deprecatedFindDeltaV(1)
@@ -182,7 +182,7 @@ def deprecatedFindDeltaV(tsiolkovsky,deltaVtime):
     else:
         true #Stops indentation errors by filling the else statement.
         #deltaV=-1*(fuelMass*gravity*time+math.log(combinationCraftMass-fuelMass*time))/fuelMass
-        #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection])/Sqrt[-t^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftDirection])/Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]] Cos[craftDirection] - Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftDirection])^2 + gravity^2 Sin[craftDirection]^2])/(fuelMass Sqrt[-combinationThrust ^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftDirection]])'))
+        #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle])/Sqrt[-t^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftAngle])/Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] Cos[craftAngle] - Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftAngle])^2 + gravity^2 Sin[craftAngle]^2])/(fuelMass Sqrt[-combinationThrust ^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]])'))
         #Not as complicated as it looks, is from WolframAlpha's output of 'integral of sqrt((cos(a)-g+t/(m-fx))^2+(sin(a)g)^2)' where t=thrust, m=total mass, f=fuel mass, x=time, g=gravity.
         return deltaV
 
@@ -198,11 +198,12 @@ def vAccelerate(direction,magnitude): #Hey. I'm applying for a new villain loan.
     xVelocity+=m.sin(direction)*magnitude
     yVelocity+=m.cos(direction)*magnitude
 
-def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplicates):
-    output=prunes
-    '''outputIDs=[]
-    for ID in range(len(prunes)):
-        outputIDs.append(ID)''' #Not necessary.
+def pruneCombinations(prunes,pruneStatistics,pruneDuplicates):
+    statisticPrunes=[list(row) for row in zip(*pruneStatistics)] #Transposed because I want all elements with a position in the second dimension (the statistics themselves), not the first (the combinations) and don't think there's syntax otherwise.
+    pruneMasses=statisticPrunes[0]
+    pruneThrusts=statisticPrunes[1]
+    pruneImpulses=statisticPrunes[3]
+    output=[prunes,pruneStatistics]
     c=0
     for _ in range(len(prunes)):
         uhOh=0
@@ -228,24 +229,27 @@ def pruneCombinations(prunes,pruneMasses,pruneThrusts,pruneImpulses,pruneDuplica
                 d+=1
         if uhOh==0:
             c+=1
-    return output
+    global prunedCombinations
+    prunedCombinations=output[0]
+    global prunedStatistics
+    prunedStatistics=output[1]
 
 def pruneAllStages(pruneDuplicates):
     for s in range(len(stageCombinations)):
-        stageCombinations[s]=pruneCombinations(stageCombinations[s],stageCombinationStatistics[s][0],stageCombinationStatistics[s][1],stageCombinationStatistics[s][3],pruneDuplicates)
-    clearCombinationStatistics()
-    findCombinationStatisticsForAllStages(1,0,1)
+        pruneCombinations(stageCombinations[s],stageCombinationStatistics[s][0],stageCombinationStatistics[s][1],stageCombinationStatistics[s][3],pruneDuplicates)
+        stageCombinations[s]=prunedCombinations
+        stageCombinationStatistics[s]=prunedStatistics
 
 def findSuffix(number,append):
     strumber=str(number)
     global suffix
-    if strumber[len(strumber)-2]==1:
+    if len(strumber)>1 and strumber[len(strumber)-2]==1:
         output='th'
-    elif strumber[len(strumber)-1]==1:
+    elif strumber[len(strumber)-1]=="1":
         output='st'
-    elif strumber[len(strumber)-1]==2:
+    elif strumber[len(strumber)-1]=="2":
         output='nd'
-    elif strumber[len(strumber)-1]==3:
+    elif strumber[len(strumber)-1]=="3":
         output='rd'
     else:
         output='th'
@@ -261,22 +265,19 @@ stageMasses=[]
 stageFuelMasses=[]
 stageSeparationForces=[]
 stageAerodynamicDrags=[]
+stageCumulativeMasses=[]
 for s in range(stages):
-    stageMasses.append(input("What is your "+findSuffix(s,1)+" stage's mass (excluding above stages)?"))
+    stageMasses.append(input("What is your "+findSuffix(s+1,1)+" stage's mass (excluding above stages)? (t) "))
     stageFuelMasses.append(input("Of which how much is fuel?"))
     if s<stages-1:
-        stageSeparationForces.append(input("How much separation force does this stage have from its successor?"))
-    stageAerodynamicDrags.append(input("How much aerodynamic drag does the rocket have at this stage?"))
+        stageSeparationForces.append(input("How much separation force does this stage have from its successor? (kN) "))
+    stageAerodynamicDrags.append(input("How much aerodynamic drag does the rocket have at this stage? "))
+    print("")
 for s in range(stages-1,0,-1):
     stageCumulativeMasses.insert(0,sumList(stageMasses,s,stages))
 print(stageCumulativeMasses)
+craftMass=stageCumulativeMasses[0]
 
-payloadMass=input("Payload (non-engine) mass?")
-fuelMass=input("Of which fuel mass available for this stage?")
-#payloadMass=payloadMass-fuelMass
-craftMass=payloadMass+fuelMass
-gravity=input("Gravity?")
-craftDirection=0
 findCombinationsForAllStages()
 findCombinationStatisticsForAllStages(1,0,1)
 pruneAllStages(0)
