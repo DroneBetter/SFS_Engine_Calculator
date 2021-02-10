@@ -72,11 +72,11 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
         combinationMass=0
         combinationThrust=0
         combinationConsumption=0
-        for target in range(len(combination)):
+        for target in combination:
             if accountForOwnMass == 1:
-                combinationMass+=engineMasses[combination[target]]
-            combinationThrust+=engineThrusts[combination[target]]
-            combinationConsumption+=engineConsumptions[combination[target]]
+                combinationMass+=engineMasses[target]
+            combinationThrust+=engineThrusts[target]
+            combinationConsumption+=engineConsumptions[target]
         combinationStatistics.append(combinationMass)
         combinationStatistics.append(combinationThrust)
         combinationStatistics.append(combinationConsumption)
@@ -107,14 +107,14 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
 def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines): #stage argument wants a list of the stage's combinations, not its identifier in the list.
     global stageCombinations
     global stageCombinationStatistics
-    for c in range(len(stage)):
+    for c in stage:
         clearCombinationStatistics()
-        findCombinationStatistics(stage[c],constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
+        findCombinationStatistics(c,constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
         stageCombinationStatistics.append(combinationStatistics)
 
-def findCombinationStatisticsForAllStages(constants,nonConstants,prune):
-    for s in range(len(stageCombinations)):
-        findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,gravity,payloadWithEngines)
+def findCombinationStatisticsForAllStages(constants,nonConstants,gravity,payloadWithEngines):
+    for s in stageCombinations:
+        findStageCombinationStatistics(s,constants,nonConstants,gravity,payloadWithEngines)
 
 def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in stageCombinations[n] that has this possibility's engines for this stage.
     global targets
@@ -205,10 +205,10 @@ def pruneCombinations(prunes,pruneStatistics,pruneDuplicates):
     pruneImpulses=statisticPrunes[3]
     output=[prunes,pruneStatistics]
     c=0
-    for _ in range(len(prunes)):
+    for badC in prunes: #You can't have a for loop without an iterator.
         uhOh=0
         d=0
-        for _ in range(c+1,len(prunes)):
+        for badD in range(c+1,len(prunes)):
             ohUh=0
             if uhOh==0:
                 if pruneMasses[d]==pruneMasses[c] and pruneThrusts[d]==pruneThrusts[c] and pruneImpulses[d]==pruneImpulses:
