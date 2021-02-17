@@ -1,7 +1,14 @@
 # SFS_Engine_Calculator
 A Python command line tool to tell you the best combination of engines for every stage of a given rocket in the game Spaceflight Simulator.
-# Not yet functional or close to being such
-Being worked on (hopefully still will be when you read this).
+
+# Python version isn't yet functional or close to being such
+Being worked on (hopefully still will be when you read this). In the meantime, the Scratch version works.
+
+# Links
+[Development Scratch version](https://scratch.mit.edu/projects/440582854), [TurboWarp](https://turbowarp.org/440582854) (I edit it there online and commit releases to this repo with changelogs, but that version works most of the time and can be run in-browser).
+[Wiki](https://github.com/DroneBetter/SFS_Engine_Calculator/wiki) (explains some equations used, isn't finished).
+Play Spaceflight Simulator itself: [Android](https://play.google.com/store/apps/details?id=com.StefMorojna.SpaceflightSimulator), [iOS](https://apps.apple.com/us/app/spaceflight-simulator/id1308057272).
+
 # TODO
 ## Python
 Make constants calculation work, make documentation (explain what every function and variable does, possibly disambiguate variable names in the process), clean up earlier functions (ie. findCombinations()) and finish the delta-v calculation and output display, eventually make most functions use return() to be cleaner and use fewer lists.
