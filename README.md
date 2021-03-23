@@ -18,13 +18,9 @@ The Scratch version calculates delta-v (its metric for comparing combinations) w
 
 # TODO
 ## Python
-Make constants calculation work, make documentation (explain what every function and variable does, possibly disambiguate variable names in the process), clean up earlier functions (ie. findCombinations()) and finish the delta-v calculation and output display, eventually make most functions use return() to be cleaner and use fewer lists.
+Make constants calculation work, make documentation (explain what every function and variable does, possibly disambiguate variable names in the process) and finish the frame-by-frame delta-v calculation and output display, make more (possibly all) functions use return() for their outputs to be cleaner and use fewer lists and allow more concise abstraction.
 
 ## Scratch
-Re-add temporarily-removed things (like angle and percentage of fuel expected to be used, buttons currently ineffectual) and add more such options (with the other Tsiolkovsky-derived equations), electricity logistics (so it doesn't try to maximise Ion Engines when each is 5 times heavier with necessary solar panel arrays, will be togglable because 1.5 temporarily removed it) and non-1.5 engine statistics (though most wiki pages are unclear about the exact versions of changes) (will also be in toggling submenu).
+Re-add temporarily-removed things (like angle and percentage of fuel expected to be used, buttons currently ineffectual), add more threshold options with the other Tsiolkovsky-derived equations (ie. a toggle of whether to change fuel tank mass to a combination's optimal and treat the inputted fuel tank mass as a maximum instead of a given) and non-1.5 engine statistics (though most wiki pages are unclear about the exact versions of statistic changes) (will also be in toggling submenu).
 
-Make option for whether craft lifts off from the ground or the air only exist if gravity > 0, otherwise hide option when inapplicable (also make minimum TWR hide at 0 gravity).
-
-Make optimal fuel mass equation also account for fuel tank mass only being 90% fuel.
-
-Eventually add mouse-only navigation (for mobile users, because they can use the buttons and input parameters with on-screen keyboards but can't toggle graphing mode or do the calculation because they can't press G or space).
+Eventually add mouse-only navigation (for mobile users, because they can use the buttons with touchscreens and input numbers with on-screen keyboards but can't toggle graphing mode or do the calculation because they can't press G or space), potentially keyboard-only mode (with QWERTY physical key positions corresponding with button positions).
