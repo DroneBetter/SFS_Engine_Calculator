@@ -77,19 +77,12 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
                 combinationMass+=engineMasses[target]
             combinationThrust+=engineThrusts[target]
             combinationConsumption+=engineConsumptions[target]
-        combinationStatistics.append(combinationMass)
-        combinationStatistics.append(combinationThrust)
-        combinationStatistics.append(combinationConsumption)
-        combinationStatistics.append(combinationThrust/combinationConsumption)
-        combinationStatistics.append(craftMass+combinationMass)
-        combinationStatistics.append(combinationThrust/combinationCraftMass)
+        combinationStatistics.extend((combinationMass, combinationThrust, combinationConsumption, combinationThrust/combinationConsumption, craftMass+combinationMass, combinationThrust/combinationCraftMass))
     if nonConstants == 1: #Non-constants regard external gravity and angle, etc.; Gravity force, lift (at angle), angular TWR, .
         combinationGravityForce=gravity*combinationCraftMass
-        combinationStatistics.append(combinationGravityForce)
         combinationLift=m.cos(craftAngle)*combinationThrust
-        combinationStatistics.append(combinationLift)
         combinationAngularTWR=combinationLift/combinationGravityForce
-        combinationStatistics.append(combinationAngularTWR)
+        combinationStatistics.extend((combinationGravityForce, combinationLift, combinationAngularTWR))
         #combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftAngle)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
         #combinationStatistics.append(combinationEffectiveEfficiency)
         global combinationDeltaV
