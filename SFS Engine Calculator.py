@@ -34,34 +34,29 @@ def directionAndDistance(inDirection,inDistance,x1,y1,x2,y2):
         distance=sqrt(xD^2+yD^2)
 
 def findCombinations(combinationEngines):
-    #if engines>1:
-        #findCombinations(engines-1)
-    currentCombination=[0]*combinationEngines
-    #print("Beginning combination:",currentCombination)
-    target=combinationEngines-1
-    while target>-1:
-        if target==combinationEngines-1:
-            combinations.append(list(currentCombination))
-            #print("Changed last:",currentCombination)
-            currentCombination[target]+=1
-        #print("Dominoing:",(not(target==-1))and(currentCombination[target]==engines))
-        while not(target==-1) and currentCombination[target]==engines:
-            currentCombination[target-1]+=1
-            for target2 in range(target,combinationEngines):
-                currentCombination[target2]=currentCombination[target-1]
-                #print("Dominoes:",currentCombination)
-            target-=1
-        if target>-1:
-            target=combinationEngines-1
-    stageCombinations.append(combinations)
+    currentCombination=[]
+    for combinationEngines:
+        currentCombination=[0]*(len(currentCombination)+1)
+        #print("Beginning combination:",currentCombination)
+        target=combinationEngines-1
+        while target>-1:
+            if target==combinationEngines-1:
+                combinations.append(list(currentCombination))
+                #print("Changed last:",currentCombination)
+                currentCombination[target]+=1
+            #print("Dominoing:",(not(target==-1))and(currentCombination[target]==engines))
+            while not(target==-1) and currentCombination[target]==engines:
+                currentCombination[target-1]+=1
+                for target2 in range(target,combinationEngines):
+                    currentCombination[target2]=currentCombination[target-1]
+                    #print("Dominoes:",currentCombination)
+                target-=1
+            if target>-1:
+                target=combinationEngines-1
+        return combinations
 
 def findCombinationsForAllStages():
-    for s in range(0,len(stages)):
-        findCombinations(stageMasses[s])
-        stageCombinations.append(stageCombinations)
-
-def clearCombinationStatistics():
-    combinationStatistics=[]
+    stageCombinations.append(findCombinations(stageMasses[s]))
 
 def clearStageStatistics():
     stageCombinationStatistics=[]
@@ -95,7 +90,7 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
             deprecatedFindDeltaV(0,1)
             combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
         combinationStatistics.append(combinationDeltaV)
-    return(combinationStatistics)
+    return combinationStatistics
 
 
 def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines): #stage argument wants a list of the stage's combinations, not its identifier in the list.
@@ -110,9 +105,7 @@ def findCombinationStatisticsForAllStages(constants,nonConstants,gravity,payload
         findStageCombinationStatistics(s,constants,nonConstants,gravity,payloadWithEngines)
 
 def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs combinationsOfStages, first dimension is possibilities across the entire craft, nth position in second dimension is the position in stageCombinations[n] that has this possibility's engines for this stage.
-    global targets
     currentCombination=[0]*stages
-    targets=[0]*stages
     target=stages-1
     while target>-1:
         if target==stages-1:
@@ -127,8 +120,13 @@ def greatIterator(): #Run once after using findCombinationsForAllStages. Outputs
             target-=1
         if target>-1:
             target=stages-1
+    return combinationsOfStages
 
-def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
+def findAllPossibilityStatistics(possibilities,constants,nonConstants):
+    for p in range(len(possibilities)):
+        allPossibilityStatistics.append(findPossibilityStatistics(possibilities[p],constants,nonConstants))
+
+def findPossibilityStatistics(possibility,constants,nonConstants):
     global combinationsOfStages
     global engineCumulativeMasses
     engineCumulativeMasses=[]
@@ -140,19 +138,16 @@ def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
         stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
         findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,stageCumulativeMassesWithEngines[s],1)
     for s in stages:
-        possibilityStatistics.append(findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,0,stageCumulativeMassesWithEngines[s],0,0,0))
+        possibilityStatistics.append(findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,1,stageCumulativeMassesWithEngines[s],stageFuelMasses[s],0,0))
+    return possibilityStatistics
+    #calculatePerFrameDeltaV()
 
-def calculatePerFrameDeltaV(possibility):
+def calculatePerFrameDeltaV(possibility,stageCumulativeMassesWithEngines):
     findPossibilityStatistics(possibility,1,0,0,1)
-    global xPosition #These are only marked global because it lets embedded functions also edit them, they aren't used outside of this function.
     xPosition=0
-    global yPosition
     yPosition=315000
-    global xVelocity
     xVelocity=0
-    global yVelocity
     yVelocity=0
-    global angle
     angle=0
     for s in stages:
         findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]])
@@ -165,12 +160,8 @@ def calculatePerFrameDeltaV(possibility):
             directionAndDistance(1,1,0,0,xVelocity,yVelocity)
             vAccelerate(direction,distance*(1-(stageAerodynamicDrags*atmosphericDensity/stageCumulativeMassesWithEngines[s])))
 
-def deprecatedFindDeltaV(tsiolkovsky,deltaVtime):
+def deprecatedFindDeltaV(tsiolkovsky,deltaVtime,craftMass,payloadMass,gravity,combinationConsumption):
     if tsiolkovsky==1:
-        global craftMass
-        global payloadMass
-        global gravity
-        global combinationConsumption
         deltaV=CombinationImpulse*m.ln(craftMass/payloadMass)-gravity*(fuelMass/combinationConsumption)
     else:
         true #Stops indentation errors by filling the else statement.
@@ -274,4 +265,4 @@ craftMass=stageCumulativeMasses[0]
 findCombinationsForAllStages()
 findCombinationStatisticsForAllStages(1,0,1)
 pruneAllStages(0)
-greatIterator()
+findAllPossibilityStatistics(greatIterator(),1,1)
