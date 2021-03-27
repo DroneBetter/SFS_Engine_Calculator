@@ -95,6 +95,7 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
             deprecatedFindDeltaV(0,1)
             combinationDeltaV=(deltaV-deltaVOffset)*combinationImpulse*fuelMass 
         combinationStatistics.append(combinationDeltaV)
+    return(combinationStatistics)
 
 
 def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadWithEngines): #stage argument wants a list of the stage's combinations, not its identifier in the list.
@@ -102,8 +103,7 @@ def findStageCombinationStatistics(stage,constants,nonConstants,gravity,payloadW
     global stageCombinationStatistics
     for c in stage:
         clearCombinationStatistics()
-        findCombinationStatistics(c,constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)
-        stageCombinationStatistics.append(combinationStatistics)
+        stageCombinationStatistics.append(findCombinationStatistics(c,constants,nonConstants,payloadWithEngines,stageFuelMasses[stage],gravity)) #combination,constants,nonConstants,payloadMass,fuelMass,gravity,accountForOwnMass
 
 def findCombinationStatisticsForAllStages(constants,nonConstants,gravity,payloadWithEngines):
     for s in stageCombinations:
@@ -138,9 +138,9 @@ def findPossibilityStatistics(possibility,constants,nonConstants,gravity):
         engineCumulativeMasses.insert(0,stageCombinationStatistics[s][combinationsOfStages[possibility][s]][0]+engineCumulativeMasses[0])
     for s in stages:
         stageCumulativeMassesWithEngines.append(stageCumulativeMasses[s]+engineCumulativeMasses[s])
-        findStageCombinationStatistics(stageCombinations[s],constants,stageCumulativeMassesWithEngines[s],1)
+        findStageCombinationStatistics(stageCombinations[s],constants,nonConstants,stageCumulativeMassesWithEngines[s],1)
     for s in stages:
-        findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,0,stageCumulativeMassesWithEngines[s],0,0,0)
+        possibilityStatistics.append(findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]],1,0,stageCumulativeMassesWithEngines[s],0,0,0))
 
 def calculatePerFrameDeltaV(possibility):
     findPossibilityStatistics(possibility,1,0,0,1)
@@ -163,7 +163,7 @@ def calculatePerFrameDeltaV(possibility):
             xPosition+=xVelocity
             yPosition+=yVelocity
             directionAndDistance(1,1,0,0,xVelocity,yVelocity)
-            vAccelerate(direction,distance*(1-(stageAerodynamicDrags*atmosphericdensity/stageCumulativeMassesWithEngines[s])))
+            vAccelerate(direction,distance*(1-(stageAerodynamicDrags*atmosphericDensity/stageCumulativeMassesWithEngines[s])))
 
 def deprecatedFindDeltaV(tsiolkovsky,deltaVtime):
     if tsiolkovsky==1:
