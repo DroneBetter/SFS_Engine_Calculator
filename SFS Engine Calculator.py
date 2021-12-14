@@ -31,7 +31,7 @@ def directionAndDistance(inDirection,inDistance,x1,y1,x2,y2):
         direction=atan(xD/yD)+180*int(y1>y2)
     if inDistance==1:
         global distance
-        distance=sqrt(xD^2+yD^2)
+        distance=sqrt(xD**2+yD**2)
 
 def findCombinations(combinationEngines):
     currentCombination=[]
@@ -78,7 +78,7 @@ def findCombinationStatistics(combination,constants,nonConstants,payloadMass,fue
         combinationLift=m.cos(craftAngle)*combinationThrust
         combinationAngularTWR=combinationLift/combinationGravityForce
         combinationStatistics.extend((combinationGravityForce, combinationLift, combinationAngularTWR))
-        #combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)^2+(sin(craftAngle)*combinationThrust)^2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
+        #combinationEffectiveEfficiency=(math.sqrt((combinationLift-combinationGravityForce)**2+(sin(craftAngle)*combinationThrust)**2))/combinationConsumption*payloadMass/(payloadMass+combinationMass)*(2-1*int(combinationAngularTWR>0))
         #combinationStatistics.append(combinationEffectiveEfficiency)
         global combinationDeltaV
         if tsiolkovsky==1:
@@ -153,7 +153,7 @@ def calculatePerFrameDeltaV(possibility,stageCumulativeMassesWithEngines):
         findCombinationStatistics(stageCombinations[s][combinationsOfStages[possibility][s]])
         for frames in range(stageFuelMasses[s]/stageCombinationStatistics[s][2]):
             directionAndDistance(1,1,xPosition,yPosition,0,0)
-            vAccelerate(direction,(1/distance^2)*(9.8/(1/315000^2)))
+            vAccelerate(direction,(1/distance**2)*(9.8/(1/315000**2)))
             vAccelerate(angle,stageThrusts[s]/(stageCumulativeMassesWithEngines[stage]))
             xPosition+=xVelocity
             yPosition+=yVelocity
@@ -166,8 +166,8 @@ def deprecatedFindDeltaV(tsiolkovsky,deltaVtime,craftMass,payloadMass,gravity,co
     else:
         true #Stops indentation errors by filling the else statement.
         #deltaV=-1*(fuelMass*gravity*time+math.log(combinationCraftMass-fuelMass*time))/fuelMass
-        #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle])/Sqrt[-t^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftAngle])/Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] Cos[craftAngle] - Sqrt[-combinationThrust^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftAngle])^2 + gravity^2 Sin[craftAngle]^2])/(fuelMass Sqrt[-combinationThrust ^2 - gravity^2 (combinationCraftMass - fuelMass deltaVtime)^2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]])'))
-        #Not as complicated as it looks, is from WolframAlpha's output of 'integral of sqrt((cos(a)-g+t/(m-fx))^2+(sin(a)g)^2)' where t=thrust, m=total mass, f=fuel mass, x=time, g=gravity.
+        #deltaV=session.evaluate(wlexpr('((combinationCraftMass - fuelMass deltaVtime) (combinationThrust ArcTan[(-combinationThrust + gravity (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle])/Sqrt[-t**2 - gravity**2 (combinationCraftMass - fuelMass deltaVtime)**2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] + combinationThrust ArcTan[(-(gravity combinationCraftMass) + fuelMass gravity deltaVtime + combinationThrust Cos[craftAngle])/Sqrt[-combinationThrust**2 - gravity**2 (combinationCraftMass - fuelMass deltaVtime)**2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]] Cos[craftAngle] - Sqrt[-combinationThrust**2 - gravity**2 (combinationCraftMass - fuelMass deltaVtime)**2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]]) Sqrt[(combinationThrust/(combinationCraftMass - fuelMass deltaVtime) - gravity Cos[craftAngle])**2 + gravity**2 Sin[craftAngle]**2])/(fuelMass Sqrt[-combinationThrust**2 - gravity**2 (combinationCraftMass - fuelMass deltaVtime)**2 + 2 gravity combinationThrust (combinationCraftMass - fuelMass deltaVtime) Cos[craftAngle]])'))
+        #Not as complicated as it looks, is from WolframAlpha's output of 'integral of sqrt((cos(a)-g+t/(m-fx))**2+(sin(a)g)**2)' where t=thrust, m=total mass, f=fuel mass, x=time, g=gravity.
         return deltaV
 
 def accelerate(x,y):
@@ -189,10 +189,10 @@ def pruneCombinations(prunes,pruneStatistics,pruneDuplicates):
     pruneImpulses=statisticPrunes[3]
     output=[prunes,pruneStatistics]
     c=0
-    for badC in prunes: #You can't have a for loop without an iterator.
+    for range(len(prunes):
         uhOh=0
         d=0
-        for badD in range(c+1,len(prunes)):
+        for range(c+1,len(prunes)):
             ohUh=0
             if uhOh==0:
                 if pruneMasses[d]==pruneMasses[c] and pruneThrusts[d]==pruneThrusts[c] and pruneImpulses[d]==pruneImpulses:
@@ -200,15 +200,15 @@ def pruneCombinations(prunes,pruneStatistics,pruneDuplicates):
                             del output[d]
                             #del outputIDs[d]
                             ohUh=1
-                else:
-                    if pruneMasses[d]<=pruneMasses[c] and pruneThrusts[d]>=pruneThrusts[c] and pruneImpulses[d]>=pruneImpulses[c]:
-                            del output[c]
-                            #del outputIDs[c]
-                            uhOh=1
-                    elif pruneMasses[c]<=pruneMasses[d] and pruneThrusts[c]>=pruneThrusts[d] and pruneImpulses[c]>=pruneImpulses[d]:
-                            del output[d]
-                            #del outputIDs[d]
-                            ohUh=1
+                elif pruneMasses[d]<=pruneMasses[c] and pruneThrusts[d]>=pruneThrusts[c] and pruneImpulses[d]>=pruneImpulses[c]:
+                        del output[c]
+                        #del outputIDs[c]
+                        uhOh=1
+                        break
+                elif pruneMasses[c]<=pruneMasses[d] and pruneThrusts[c]>=pruneThrusts[d] and pruneImpulses[c]>=pruneImpulses[d]:
+                        del output[d]
+                        #del outputIDs[d]
+                        ohUh=1
             if ohUh==0:
                 d+=1
         if uhOh==0:
